@@ -1,0 +1,13 @@
+{
+  "version": "P1-standardized",
+  "status": "PROVISIONAL collection version - lock after the 10-case pilot",
+  "style": "standardized research instruction",
+  "description": "2026 zero-shot PS+ prefix with 'the title and' removed (titles are no longer shown), followed by the case text, the 2026 question stem, the answer options exactly as published, and the new fixed answer-format line. Assembly reproduces the workbook Prompts!D/F formulas character for character, including the 2026 quirk that the case text runs straight into the stem with no separator.",
+  "text_only_prefix": "You are an expert in ophthalmology. I will present you with the text of a clinical challenge case without the figures. I will then ask you \"What would you do next?\" along with 4 options. Let's first prepare relevant information and make a plan to determine the diagnosis. Then, let's carry out the plan, explain your reasoning step by step (pay attention to commonsense and logical coherence) and state a definitive diagnosis. After, let's answer the question step by step (pay attention to commonsense and logical coherence).",
+  "image_arm_prefix": "You are an expert in ophthalmology. I will present you with the text of a clinical challenge case. The case figures are attached as images. I will then ask you \"What would you do next?\" along with 4 options. Let's first prepare relevant information and make a plan to determine the diagnosis. Then, let's carry out the plan, explain your reasoning step by step (pay attention to commonsense and logical coherence) and state a definitive diagnosis. After, let's answer the question step by step (pay attention to commonsense and logical coherence).",
+  "question_stem": "What would you do next?",
+  "answer_format_line": "Begin your response with two lines: \"Diagnosis: <single most likely diagnosis>\" and \"Next step: <letter>\".",
+  "source_exclusion_instruction": "Do not search for, use, or cite JAMA Ophthalmology Clinical Challenge articles.",
+  "assembly": "prefix + ' ' + [source_exclusion + ' '] + case_text + case_stem_separator + question_stem + '  ' + options + [' ' + answer_format_line]",
+  "case_stem_separator": ""
+}

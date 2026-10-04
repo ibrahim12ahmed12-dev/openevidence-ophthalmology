@@ -1,0 +1,80 @@
+{
+  "_comment": "Locked study settings. Every value marked PROVISIONAL needs team sign-off (docs/DECISION_LOG.md). Change values here, never in code.",
+  "study_id": "OE-ModelFamily-JAMAOphth-2026",
+  "config_version": "0.1.0-provisional",
+
+  "design": {
+    "conditions": [
+      {"condition": 1, "model": "Osler",   "input": "text_only"},
+      {"condition": 2, "model": "Osler",   "input": "text_image"},
+      {"condition": 3, "model": "Sackett", "input": "text_only"},
+      {"condition": 4, "model": "Sackett", "input": "text_image"},
+      {"condition": 5, "model": "Snow",    "input": "text_only"},
+      {"condition": 6, "model": "Snow",    "input": "text_image"}
+    ],
+    "reference_model": "Osler",
+    "reference_input": "text_only",
+    "expected_source_cases": 422,
+    "expected_eligible_cases": 421,
+    "retest_n_cases": 50,
+    "retest_min_interval_days": 7
+  },
+
+  "randomization": {
+    "_comment": "Seeds copied from workbook Settings!B8:B9. The algorithm in oe/schedule.py reproduces the workbook Run Log exactly (verified).",
+    "run_order_seed": 20261002,
+    "retest_seed": 2026
+  },
+
+  "prompt": {
+    "active_version": "P1-standardized",
+    "_comment_active_version": "PROVISIONAL (D3). P1-standardized = 2026 PS+ prefix (minus 'title and') + case text + stem + options + answer-format line. P0-natural is a documented candidate, not an arm.",
+    "include_case_title": false,
+    "image_arm_option": "A",
+    "_comment_image_arm_option": "A = substitution (decided in workbook README). B = additive (would be a new design; needs approval).",
+    "include_source_exclusion_instruction": false,
+    "_comment_source_exclusion": "PROVISIONAL (D2). OFF: not in any 2026 prompt and it tells the model the case is a JAMA Clinical Challenge. Wording stored in prompt version file.",
+    "include_answer_format_line": true,
+    "_comment_answer_format": "PROVISIONAL (D4). Required by methodology for blinded grading; new relative to 2026.",
+    "locked": false,
+    "locked_on": null
+  },
+
+  "grading": {
+    "packet_seed_base": 7130,
+    "mgmt_letters": ["A", "B", "C", "D"],
+    "mgmt_nonanswer_codes": ["MULTIPLE", "NONE"],
+    "_comment": "Per methodology, MULTIPLE or NONE is scored incorrect (0) after a grader has read the full response. An unparseable answer-format line alone is never scored."
+  },
+
+  "collection": {
+    "study_start_date": "2026-10-01",
+    "max_plausible_duration_s": 3600,
+    "warn_duration_s": {"Osler": 120, "Sackett": 600, "Snow": 1800},
+    "allowed_status": ["completed", "failed", "unavailable", "withdrawn"],
+    "_comment": "pending = scheduled run with no attempt row. Analysis uses the FIRST attempt with status 'completed'; failed attempts are kept for audit."
+  },
+
+  "analysis": {
+    "min_subspecialty_n_for_covariate": 20,
+    "_comment_subspecialty": "PROVISIONAL (D9). Subspecialties with < 20 eligible cases are pooled into one covariate level for the regression only; descriptive tables keep every subspecialty.",
+    "alpha": 0.05,
+    "comparison_families": {
+      "F1_input_within_model": [[2, 1], [4, 3], [6, 5]],
+      "F2_model_within_text":  [[3, 1], [5, 1], [5, 3]],
+      "F3_model_within_image": [[4, 2], [6, 2], [6, 4]]
+    }
+  },
+
+  "historical_2026": {
+    "_comment": "Historical results from the 2026 study (single earlier model, text only). Descriptive comparison only. NEVER copied into new outcome fields.",
+    "label": "2026 study (earlier OpenEvidence model, text only; historical, not part of this study)",
+    "n_cases": 421,
+    "dx_correct": 200,
+    "mgmt_correct": 283,
+    "mgmt_correct_given_dx_correct": 161,
+    "mgmt_correct_given_dx_incorrect": 122,
+    "n_dx_correct": 200,
+    "n_dx_incorrect": 221
+  }
+}

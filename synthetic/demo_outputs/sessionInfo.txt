@@ -1,0 +1,34 @@
+R version 4.3.3 (2024-02-29)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 24.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.12.0 
+LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.12.0
+
+locale:
+[1] C
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] ggplot2_3.4.4
+
+loaded via a namespace (and not attached):
+ [1] Matrix_1.6-5       gtable_0.3.4       jsonlite_1.8.8     dplyr_1.1.4       
+ [5] compiler_4.3.3     tidyselect_1.2.0   Rcpp_1.0.12        textshaping_0.3.7 
+ [9] systemfonts_1.0.5  splines_4.3.3      scales_1.3.0       boot_1.3-30       
+[13] lattice_0.22-5     coda_0.19-4.1      TH.data_1.1-2      R6_2.5.1          
+[17] labeling_0.4.3     generics_0.1.3     MASS_7.3-60.0.1    tibble_3.2.1      
+[21] nloptr_2.0.3       munsell_0.5.0      minqa_1.2.6        pillar_1.9.0      
+[25] rlang_1.1.3        utf8_1.2.4         multcomp_1.4-25    estimability_1.4.1
+[29] cli_3.6.2          withr_2.5.0        magrittr_2.0.3     emmeans_1.10.0    
+[33] grid_4.3.3         mvtnorm_1.2-4      xtable_1.8-4       sandwich_3.1-0    
+[37] lme4_1.1-35.1      lifecycle_1.0.4    nlme_3.1-164       vctrs_0.6.5       
+[41] glue_1.7.0         farver_2.1.1       ragg_1.2.7         codetools_0.2-19  
+[45] zoo_1.8-12         survival_3.5-8     fansi_1.0.5        colorspace_2.1-0  
+[49] tools_4.3.3        pkgconfig_2.0.3   

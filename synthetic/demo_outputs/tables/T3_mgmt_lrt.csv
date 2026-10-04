@@ -1,0 +1,4 @@
+"data_status","outcome","test","chisq","df","p_value"
+"SYNTHETIC - NOT STUDY DATA","mgmt","interaction",0.255384327308093,2,0.880124271687001
+"SYNTHETIC - NOT STUDY DATA","mgmt","model_overall",5.01156695774034,4,0.286112710943644
+"SYNTHETIC - NOT STUDY DATA","mgmt","input_overall",0.503833294055312,3,0.918048450185136

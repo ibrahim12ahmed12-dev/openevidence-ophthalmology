@@ -1,0 +1,5 @@
+"data_status","analysis","cases_removed","main_runs_removed","cases_remaining","rule"
+"SYNTHETIC - NOT STUDY DATA","S1_exclude_confirmed_retrieval",58,348,363,"Excludes every case in which ANY main-condition run cited the source case."
+"SYNTHETIC - NOT STUDY DATA","S2_also_exclude_incomplete_assessment",58,348,363,"Also excludes cases with any missing/Unclear retrieval assessment (worst case)."
+"SYNTHETIC - NOT STUDY DATA","S3_complete_cases_dx",2,,419,"Cases analysable in all six main conditions"
+"SYNTHETIC - NOT STUDY DATA","S3_complete_cases_mgmt",2,,419,"Cases analysable in all six main conditions"

@@ -1,0 +1,7 @@
+"data_status","condition","label","duration_median_s","duration_q1","duration_q3","duration_n","citations_median","citations_q1","citations_q3","citations_n"
+"SYNTHETIC - NOT STUDY DATA",1,"Osler / Text only",7.5,5.2,9.8,421,7,4,10,421
+"SYNTHETIC - NOT STUDY DATA",2,"Osler / Text + image",8.1,5.5,9.9,419,7,4,10,419
+"SYNTHETIC - NOT STUDY DATA",3,"Sackett / Text only",41,29.1,50.1,421,7,4,10,421
+"SYNTHETIC - NOT STUDY DATA",4,"Sackett / Text + image",40.9,30.8,50.2,419,7,4,10,419
+"SYNTHETIC - NOT STUDY DATA",5,"Snow / Text only",309.4,230.4,401.9,421,15,12,18,421
+"SYNTHETIC - NOT STUDY DATA",6,"Snow / Text + image",322.7,227.25,396.5,419,15,12,17,419

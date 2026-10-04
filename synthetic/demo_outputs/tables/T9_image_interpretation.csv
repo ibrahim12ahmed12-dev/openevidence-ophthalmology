@@ -1,0 +1,19 @@
+"data_status","model","category","n","denominator_graded","percent_of_graded"
+"SYNTHETIC - NOT STUDY DATA","Osler","Correct",111,419,26.491646778043
+"SYNTHETIC - NOT STUDY DATA","Osler","Partly correct",97,419,23.1503579952267
+"SYNTHETIC - NOT STUDY DATA","Osler","Incorrect",119,419,28.4009546539379
+"SYNTHETIC - NOT STUDY DATA","Osler","Invented findings",92,419,21.9570405727924
+"SYNTHETIC - NOT STUDY DATA","Osler","Not described",0,419,0
+"SYNTHETIC - NOT STUDY DATA","Osler","Not yet graded",0,419,
+"SYNTHETIC - NOT STUDY DATA","Sackett","Correct",90,419,21.4797136038186
+"SYNTHETIC - NOT STUDY DATA","Sackett","Partly correct",111,419,26.491646778043
+"SYNTHETIC - NOT STUDY DATA","Sackett","Incorrect",117,419,27.9236276849642
+"SYNTHETIC - NOT STUDY DATA","Sackett","Invented findings",101,419,24.1050119331742
+"SYNTHETIC - NOT STUDY DATA","Sackett","Not described",0,419,0
+"SYNTHETIC - NOT STUDY DATA","Sackett","Not yet graded",0,419,
+"SYNTHETIC - NOT STUDY DATA","Snow","Correct",99,419,23.6276849642005
+"SYNTHETIC - NOT STUDY DATA","Snow","Partly correct",108,419,25.7756563245823
+"SYNTHETIC - NOT STUDY DATA","Snow","Incorrect",98,419,23.3890214797136
+"SYNTHETIC - NOT STUDY DATA","Snow","Invented findings",114,419,27.2076372315036
+"SYNTHETIC - NOT STUDY DATA","Snow","Not described",0,419,0
+"SYNTHETIC - NOT STUDY DATA","Snow","Not yet graded",0,419,

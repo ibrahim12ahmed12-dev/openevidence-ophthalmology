@@ -1,0 +1,1 @@
+response_id,case_id,reference_diagnosis,accepted_dx_synonyms,answer_options,correct_letter,auto_diagnosis,auto_letter,extraction_flags,response_file,grader_id,extracted_diagnosis_confirmed,dx_correct,dx_partial,dx_reason,mgmt_letter,mgmt_correct,mgmt_reason,flag_for_discussion,graded_date

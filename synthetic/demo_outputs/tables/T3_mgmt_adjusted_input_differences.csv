@@ -1,0 +1,4 @@
+"data_status","outcome","contrast","diff_pp","lower_pp","upper_pp"
+"SYNTHETIC - NOT STUDY DATA","mgmt","Osler : Text + image minus Text only",0.0594475647805237,-6.17655221245139,6.0591422973571
+"SYNTHETIC - NOT STUDY DATA","mgmt","Sackett : Text + image minus Text only",-2.08360712727206,-8.18175927703092,3.77607772200644
+"SYNTHETIC - NOT STUDY DATA","mgmt","Snow : Text + image minus Text only",-0.63921430581303,-6.69083960887293,5.11870558414099
