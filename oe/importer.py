@@ -42,7 +42,7 @@ CASE_COLS = {  # header text in the workbook -> internal name (checked on import
 }
 
 REGISTRY_FIELDS = [
-    "case_id", "source_row", "eligible", "exclusion_reason", "subspecialty", "publication_year",
+    "case_id", "source_row", "eligible", "exclusion_reason", "exclusion_reason_workbook", "subspecialty", "publication_year",
     "source_url", "original_text", "leak_corrected_text", "leak_corrected_identical_to_original",
     "text_only_input", "text_source", "answer_options", "n_options", "options_sha256",
     "text_only_sha256", "retest_subset_workbook", "hist_prompt_had_prefix_2026",
@@ -66,6 +66,51 @@ IMAGE_FIELDS = [
     "prepared_sha256", "modality", "availability", "unavailable_reason", "width_px", "height_px",
     "preparation_steps", "label_or_caption_flag", "label_review_by", "notes",
 ]
+
+
+AWAITING = "Awaiting confirmation"
+CONFIRM_FIELDS = ["case_id", "workbook_letter", "issue", "confirmed_letter", "confirmed_by",
+                  "confirmed_date", "evidence_note"]
+
+
+def exclusion_status(include: str, workbook_reason: str) -> str:
+    """Never invent a reason: an unconfirmed workbook note becomes 'Awaiting confirmation'.
+    The workbook text is kept verbatim in exclusion_reason_workbook."""
+    if include.strip().lower() == "yes":
+        return ""
+    if not workbook_reason.strip() or "confirm" in workbook_reason.lower():
+        return AWAITING
+    return workbook_reason
+
+
+def seed_confirmations(root, keys) -> None:
+    """Create (once) the human-edited answer-key confirmation list for every flagged case."""
+    p = path(root, "answer_key").with_name("answer_key_confirmations.csv")
+    old = {r["case_id"]: r for r in read_csv(p)}
+    rows = list(old.values())
+    for k in keys:
+        chk = "; ".join(x for x in k["key_check"].replace("REVIEW: ", "").split("; ")
+                        if x and x != "OK" and "typed value" not in x)
+        if chk and str(k["case_id"]) not in old:
+            rows.append({"case_id": k["case_id"], "workbook_letter": k["correct_letter_workbook"], "issue": chk})
+    write_csv(p, rows, CONFIRM_FIELDS)
+
+
+def apply_confirmations(root) -> int:
+    """Apply human confirmations to the private answer key (letter + audit note)."""
+    p = path(root, "answer_key").with_name("answer_key_confirmations.csv")
+    conf = {r["case_id"]: r for r in read_csv(p) if (r.get("confirmed_letter") or "").strip()}
+    keys = read_csv(path(root, "answer_key"))
+    n = 0
+    for k in keys:
+        c = conf.get(k["case_id"])
+        if c:
+            k["correct_letter"] = c["confirmed_letter"].strip().upper()
+            k["key_check"] = f"CONFIRMED {k['correct_letter']} by {c.get('confirmed_by', '?')} {c.get('confirmed_date', '')}".strip()
+            n += 1
+    if keys:
+        write_csv(path(root, "answer_key"), keys, list(keys[0].keys()))
+    return n
 
 
 def _find_workbook(root: Path, explicit: str | None) -> Path:
@@ -174,7 +219,8 @@ def import_workbook(root: str | Path, workbook: str | None = None) -> dict:
         registry.append({
             "case_id": cid, "source_row": r,
             "eligible": "Yes" if _s(g["include"]).strip().lower() == "yes" else "No",
-            "exclusion_reason": _s(g["exclusion_reason"]),
+            "exclusion_reason": exclusion_status(_s(g["include"]), _s(g["exclusion_reason"])),
+            "exclusion_reason_workbook": _s(g["exclusion_reason"]),
             "subspecialty": _s(g["subspecialty"]),
             "publication_year": "",
             "source_url": _s(g["source_url"]),
@@ -247,6 +293,8 @@ def import_workbook(root: str | Path, workbook: str | None = None) -> dict:
     # ---------------- write -----------------
     write_csv(path(root, "registry"), registry, REGISTRY_FIELDS)
     write_csv(path(root, "answer_key"), keys, ANSWER_KEY_FIELDS)
+    seed_confirmations(root, keys)
+    apply_confirmations(root)
     write_csv(path(root, "historical"), hist)
     write_csv(path(root, "workbook_schedule"), sched)
     write_csv(root / "registry" / "workbook_settings_snapshot.csv",

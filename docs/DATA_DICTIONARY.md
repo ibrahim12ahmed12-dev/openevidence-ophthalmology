@@ -12,7 +12,8 @@ tools; do not edit). **H** = human-edited (seeded once, never overwritten).
 | case_id | Stable integer ID (= workbook `Case ID`, column R). Never changes. |
 | source_row | Workbook row (audit only) |
 | eligible | Yes/No, from workbook column S |
-| exclusion_reason | Verbatim from workbook column T. Never invented. |
+| exclusion_reason | "Awaiting confirmation" when the workbook note asks for confirmation or is blank; otherwise the workbook reason. Never invented. |
+| exclusion_reason_workbook | Workbook column T, verbatim |
 | subspecialty | The 2026 classification, unchanged (10 groups) |
 | publication_year | Copied from annotations at build time (blank in the registry) |
 | source_url | Article link. Never shown in model inputs. |
@@ -35,6 +36,14 @@ tools; do not edit). **H** = human-edited (seeded once, never overwritten).
 `correct_letter_from_text` (best-matching option, audit only) and `key_check`
 (`OK` or `REVIEW: ...`). Also `correct_answer_text` (the first line of
 workbook I), `answer_key_explanation` (the rest of I) and `discussion`.
+
+## registry/answer_key_confirmations.csv (H)
+
+One row per answer key flagged by the import audit: `case_id,
+workbook_letter, issue, confirmed_letter, confirmed_by, confirmed_date,
+evidence_note`. When `confirmed_letter` is filled (in Pilot Desk → Answer
+keys), it replaces `correct_letter` in the private answer key, with
+`key_check = "CONFIRMED <letter> by <initials> <date>"`. The workbook is never changed.
 
 ## registry/case_annotations.csv (H)
 
@@ -149,3 +158,15 @@ analyzable_mgmt` (1 = completed, final grade present, eligible case),
 scores (workbook O–Q). It is **never merged into the new analysis dataset**
 (check C15). The R analysis uses only the aggregate counts in
 `config/study_config.json → historical_2026`.
+
+## pilot/ (separate data root for the 10-case pilot)
+
+`data/pilot/` has its own `schedule/` (run IDs `P-NNN-Ck`, run_type `Pilot`,
+same within-case order as the main schedule), `prompts/`,
+`collection/collection_log.csv` (plus `responses/` and `screenshots/` saved by
+Pilot Desk), `grading/` and `reports/`. Its registry, answer key, annotations,
+image-arm text and images are **shared** with `data/`
+(`config_override.json → shared_registry_root`), so preparation carries over.
+`pilot_signoff.json` records the model-selector check and named
+collectors/graders. `PILOT_README.md` marks the folder as pilot data. Check C16
+fails if pilot runs ever appear in the main collection log.

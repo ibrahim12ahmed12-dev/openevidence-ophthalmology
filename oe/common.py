@@ -77,8 +77,30 @@ def cond_lookup(cfg: dict | None = None) -> dict[int, dict]:
     return {c["condition"]: c for c in conditions(cfg)}
 
 
+SHARED_KEYS = {"registry", "answer_key", "annotations", "image_arm", "images", "registry_lock",
+               "historical", "workbook_schedule", "source"}
+
+
+def registry_root(root: str | Path) -> Path:
+    """A pilot root shares the main root's registry and images (config_override
+    'shared_registry_root'), so approvals made during the pilot carry over, while
+    its schedule, prompts, collection log and grading stay separate."""
+    o = Path(root) / "config_override.json"
+    if o.exists():
+        with open(o, encoding="utf-8") as fh:
+            rel = json.load(fh).get("shared_registry_root")
+        if rel:
+            return (Path(root) / rel).resolve()
+    return Path(root)
+
+
 def path(root: str | Path, key: str) -> Path:
-    return Path(root) / LAYOUT[key]
+    base = registry_root(root) if key in SHARED_KEYS else Path(root)
+    return base / LAYOUT[key]
+
+
+def images_dir(root: str | Path) -> Path:
+    return registry_root(root) / "images" / "prepared"
 
 
 def read_csv(p: str | Path) -> list[dict]:

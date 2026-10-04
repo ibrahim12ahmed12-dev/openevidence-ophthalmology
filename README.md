@@ -17,6 +17,22 @@ and the statistical analysis.
 > contaminate the benchmark, and the JAMA text is copyrighted. Only code, ID-only
 > schedules, empty templates and synthetic demos are committed.
 
+## Start here if you do not code: the 10-case pilot
+
+Double-click **Start Pilot Desk** (`.command` on Mac, `.bat` on Windows). It
+opens point-and-click pages in your browser for:
+
+* reviewing image-arm text,
+* describing images,
+* recording the six OpenEvidence runs per case,
+* confirming answer keys,
+* running the checks,
+* exporting blinded grading packets and combining returned grades.
+
+It runs only on your computer. Step-by-step instructions are in
+**[docs/PILOT_GUIDE.md](docs/PILOT_GUIDE.md)**. Pilot data stay in
+`data/pilot/`, separate from the main study.
+
 ## What is where
 
 | Path | What it is |
@@ -24,6 +40,7 @@ and the statistical analysis.
 | `docs/IMPLEMENTATION_CHECKLIST.md` | What is specified, what was built, what is missing, contradictions found |
 | `docs/DECISION_LOG.md` | Every provisional default and every decision the team still owes |
 | `docs/DATA_DICTIONARY.md` | Every file and column |
+| `docs/PILOT_GUIDE.md` | Plain-language pilot instructions (Pilot Desk) |
 | `docs/SOP_collection.md`, `docs/SOP_grading.md` | One-page instructions for collectors and graders |
 | `docs/METHODS_DRAFT.md` | Methods text describing only the workflow as built |
 | `docs/HANDOFF.md` | What works, what was tested, what is still open |

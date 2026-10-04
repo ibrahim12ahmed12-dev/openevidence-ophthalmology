@@ -56,8 +56,9 @@ def build_prompt(spec: dict, settings: dict, case_text: str, options: str, input
 
 def generate(root, version: str | None = None, settings_override: dict | None = None,
              include_ineligible: bool = False) -> dict:
-    cfg = load_config()
+    cfg = load_config(root)
     settings = dict(cfg["prompt"])
+    scope = {str(c) for c in cfg.get("pilot", {}).get("case_ids", [])}
     settings.update(settings_override or {})
     version = version or settings["active_version"]
     spec = load_version(version)
@@ -68,6 +69,8 @@ def generate(root, version: str | None = None, settings_override: dict | None = 
     rows = []
     for r in reg:
         if r["eligible"] != "Yes" and not include_ineligible:
+            continue
+        if scope and r["case_id"] not in scope:
             continue
         cid = r["case_id"]
         imgs = [i for i in images if i["case_id"] == cid and i.get("availability", "").lower() == "available"]

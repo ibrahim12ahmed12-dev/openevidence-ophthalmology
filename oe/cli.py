@@ -46,6 +46,10 @@ def main(argv=None):
     p = sub.add_parser("lock-registry", help="fingerprint case IDs/text/options/keys")
     p.add_argument("--by", required=True)
     sub.add_parser("hash-images", help="record SHA-256 of prepared images")
+    p = sub.add_parser("pilot-setup", help="create the separate 10-case pilot folder (data/pilot)")
+    p.add_argument("--cases", help="comma-separated case IDs (default: seeded random selection)")
+    p = sub.add_parser("app", help="start Pilot Desk, the point-and-click interface")
+    p.add_argument("--port", type=int, default=8765); p.add_argument("--no-browser", action="store_true")
     p = sub.add_parser("synthetic", help="build the SYNTHETIC demonstration data root")
     p.add_argument("--out", default="synthetic/demo_data"); p.add_argument("--seed", type=int, default=11)
 
@@ -85,6 +89,12 @@ def main(argv=None):
         _print(admin.lock_registry(root, a.by))
     elif a.cmd == "hash-images":
         _print(admin.hash_images(root))
+    elif a.cmd == "pilot-setup":
+        from . import pilot
+        _print(pilot.setup(root, case_ids=a.cases.split(",") if a.cases else None))
+    elif a.cmd == "app":
+        from . import app
+        app.serve(root, a.port, not a.no_browser)
     elif a.cmd == "synthetic":
         from . import synthetic
         _print(synthetic.build(a.out, a.seed))

@@ -4,7 +4,7 @@ from __future__ import annotations
 import datetime as dt
 from pathlib import Path
 
-from .common import path, read_csv, sha256_file, sha256_text, write_csv
+from .common import images_dir, path, read_csv, sha256_file, sha256_text, write_csv
 
 
 def lock_registry(root, by: str) -> dict:
@@ -26,7 +26,7 @@ def hash_images(root) -> dict:
     imgs = read_csv(path(root, "images"))
     n = 0
     for i in imgs:
-        fp = Path(root) / "images" / "prepared" / (i.get("prepared_filename") or "")
+        fp = images_dir(root) / (i.get("prepared_filename") or "")
         if i.get("prepared_filename") and fp.is_file() and not i.get("prepared_sha256"):
             i["prepared_sha256"] = sha256_file(fp)
             n += 1

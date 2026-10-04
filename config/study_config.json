@@ -33,9 +33,9 @@
     "image_arm_option": "A",
     "_comment_image_arm_option": "A = substitution (decided in workbook README). B = additive (would be a new design; needs approval).",
     "include_source_exclusion_instruction": false,
-    "_comment_source_exclusion": "PROVISIONAL (D2). OFF: not in any 2026 prompt and it tells the model the case is a JAMA Clinical Challenge. Wording stored in prompt version file.",
+    "_comment_source_exclusion": "D2: OFF, provisionally decided by PI 2026-10-04 (do not prompt OpenEvidence to look for the JAMA cases). Wording kept in the prompt version file.",
     "include_answer_format_line": true,
-    "_comment_answer_format": "PROVISIONAL (D4). Required by methodology for blinded grading; new relative to 2026.",
+    "_comment_answer_format": "D4: answer lines at the TOP of the response, provisionally decided by PI 2026-10-04. Required for blinded grading; new relative to 2026.",
     "locked": false,
     "locked_on": null
   },

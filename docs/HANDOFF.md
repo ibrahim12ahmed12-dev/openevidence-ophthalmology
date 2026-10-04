@@ -1,5 +1,16 @@
 # Handoff
 
+## Pilot status (updated 4 October 2026)
+
+* **Pilot Desk** (`Start Pilot Desk.command` / `.bat`, or `python -m oe app`) is a local point-and-click interface for the whole pilot. Instructions: `docs/PILOT_GUIDE.md`.
+* **Pilot folder** `data/pilot/`: cases 31, 75, 100, 108, 156, 173, 225, 301, 390 and 414 (seeded draw); 60 runs; kept separate from the main study (D19, check C16).
+* **Decisions recorded:** source-exclusion instruction off (D2) and answer lines at the top (D4), both provisional per the PI; substitution kept provisional (D1); case 234 marked "Awaiting confirmation" (D6); keys 369/397 awaiting confirmation (D5), excluded from the pilot.
+* **Still blocking the first pilot run:**
+  * image-arm text approval for the 10 cases;
+  * prepared images and their descriptions;
+  * the model-selector check and the named people (sign-off form).
+* **Needed before pilot grading:** accepted synonyms for the 10 cases.
+
 ## What works now
 
 * **Import and audit of the real workbook.** It is opened read-only and its

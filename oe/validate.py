@@ -16,7 +16,7 @@ from pathlib import Path
 
 from .build import parse_dt
 from .collection import FIELDS as COLL_FIELDS, HELPER, derive_runs
-from .common import (MODELS, content_tokens, load_config, norm_key, path, read_csv, sha256_file,
+from .common import (images_dir, MODELS, content_tokens, load_config, norm_key, path, read_csv, sha256_file,
                      sha256_text, shingles, write_csv)
 from .grading import FORBIDDEN_PACKET_COLUMNS, INTERP_CATEGORIES, read_returns
 
@@ -47,11 +47,13 @@ def check_schedule(rep, cfg, reg, sched):
             rep.add("ERROR", c, f"{k[1]}/C{k[2]}/{k[0]}", f"case-condition combination scheduled {n} times")
     c = "C02 missing expected runs"
     elig = {r["case_id"] for r in reg if r["eligible"] == "Yes"}
+    pilot = cfg.get("pilot")
+    main_type = "Pilot" if pilot else "Main"
     have = defaultdict(set)
     for s in sched:
         have[(s["run_type"], s["case_id"])].add(int(s["condition"]))
     for cid in sorted(elig, key=int):
-        miss = set(range(1, 7)) - have[("Main", cid)]
+        miss = set(range(1, 7)) - have[(main_type, cid)]
         if miss:
             rep.add("ERROR", c, cid, f"main runs missing for conditions {sorted(miss)}")
     rt_cases = {k[1] for k in have if k[0] == "Retest"}
@@ -59,13 +61,20 @@ def check_schedule(rep, cfg, reg, sched):
         miss = set(range(1, 7)) - have[("Retest", cid)]
         if miss:
             rep.add("ERROR", c, cid, f"retest runs missing for conditions {sorted(miss)}")
-    n_main = sum(s["run_type"] == "Main" for s in sched)
+    n_main = sum(s["run_type"] == main_type for s in sched)
     exp_main = len(elig) * 6
     if n_main != exp_main:
-        rep.add("ERROR", c, "schedule", f"{n_main} main runs scheduled; expected {exp_main} (eligible cases x 6)")
-    if len(rt_cases) != cfg["design"]["retest_n_cases"]:
+        rep.add("ERROR", c, "schedule", f"{n_main} {main_type.lower()} runs scheduled; expected {exp_main} (cases x 6)")
+    if any(s["run_type"] not in ("Main", "Retest", "Pilot") for s in sched):
+        rep.add("ERROR", c, "schedule", "unknown run_type in schedule")
+    if pilot:
+        if any(s["run_type"] != "Pilot" for s in sched):
+            rep.add("ERROR", "C16 pilot separation", "schedule", "pilot schedule contains non-pilot runs")
+    elif any(s["run_type"] == "Pilot" for s in sched):
+        rep.add("ERROR", "C16 pilot separation", "schedule", "main schedule contains pilot runs")
+    if not pilot and len(rt_cases) != cfg["design"]["retest_n_cases"]:
         rep.add("ERROR", c, "schedule", f"{len(rt_cases)} retest cases; protocol specifies {cfg['design']['retest_n_cases']}")
-    if len(elig) != cfg["design"]["expected_eligible_cases"]:
+    if not pilot and len(elig) != cfg["design"]["expected_eligible_cases"]:
         rep.add("WARNING", c, "registry", f"{len(elig)} eligible cases; protocol expects {cfg['design']['expected_eligible_cases']}")
     c = "C03 excluded cases in workflow"
     for s in sched:
@@ -85,7 +94,8 @@ def check_registry(rep, root, reg, keys, ann):
     else:
         L = {r["case_id"]: r for r in lock}
         cur = {r["case_id"]: r for r in reg}
-        for cid in sorted(set(L) | set(cur), key=int):
+        scope = set(cur) if any(r.get("_pilot_scope") for r in reg) else set(L) | set(cur)
+        for cid in sorted(scope, key=int):
             if cid not in cur:
                 rep.add("ERROR", c, cid, "case ID present at lock time has disappeared")
                 continue
@@ -108,7 +118,7 @@ def check_registry(rep, root, reg, keys, ann):
         elig = next((r["eligible"] for r in reg if r["case_id"] == cid), "")
         chk = k["key_check"].replace("REVIEW: ", "")
         chk = "; ".join(x for x in chk.split("; ") if "typed value" not in x)
-        if chk and chk != "OK" and elig == "Yes":
+        if chk and chk != "OK" and not chk.startswith("CONFIRMED") and elig == "Yes":
             rep.add("WARNING", c, cid, "answer key needs human confirmation: " + chk)
     for r in reg:
         if r["eligible"] != "Yes" and (not r["exclusion_reason"] or "confirm" in r["exclusion_reason"].lower()):
@@ -198,7 +208,7 @@ def check_images(rep, root, reg, keys, images, runs):
             rep.add(rep.sev({"setup": "WARNING", "default": "WARNING"}), c9, i.get("image_id"), "availability not recorded")
         if av == "available":
             pf = i.get("prepared_filename", "")
-            fp = Path(root) / "images" / "prepared" / pf
+            fp = images_dir(root) / pf
             if not pf:
                 rep.add("ERROR", c9, i.get("image_id"), "available image has no prepared_filename")
             elif not fp.exists():
@@ -443,6 +453,16 @@ def run(root, stage: str = "collection", graders=("G1", "G2"), write: bool = Tru
     active = read_csv(Path(root) / "prompts" / f"prompts_{cfg['prompt']['active_version']}.csv")
     if not reg:
         rep.add("ERROR", "C00 inputs", "registry", "case registry missing - run `python -m oe import`")
+    if cfg.get("pilot"):
+        ids = {str(c) for c in cfg["pilot"]["case_ids"]}
+        reg = [dict(r, _pilot_scope=1) for r in reg if r["case_id"] in ids]
+        keys = [k for k in keys if k["case_id"] in ids]
+        images = [i for i in images if i["case_id"] in ids]
+        # main-study collection folders must stay untouched by the pilot
+        main_coll = path(Path(root).resolve().parent, "collection") if Path(root).name == "pilot" else None
+        if main_coll and main_coll.exists():
+            if any(a["run_id"].startswith("P-") for a in read_csv(main_coll)):
+                rep.add("ERROR", "C16 pilot separation", "data/collection", "pilot run IDs found in the MAIN collection log")
     check_schedule(rep, cfg, reg, sched)
     check_registry(rep, root, reg, keys, ann)
     check_image_arm(rep, reg, arm, runs)
