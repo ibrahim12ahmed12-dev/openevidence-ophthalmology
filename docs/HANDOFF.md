@@ -11,6 +11,22 @@
   * the model-selector check and the named people (sign-off form).
 * **Needed before pilot grading:** accepted synonyms for the 10 cases.
 
+## Figure download (added 14 October 2026)
+
+* **Pilot Desk → Figures:** a gated 3-case test, then 10 pilot cases, then all
+  included cases. It is resumable and slow on purpose, saves originals in
+  `data/images/original/`, keeps a manifest, and offers a preview/review page,
+  manual upload for blocked figures, and a "prepared copy" button that works
+  only after human confirmation.
+* **Tested only on a local synthetic site** (12 tests): a normal page with
+  thumbnail, logo, related-article and discussion figures; a sign-in page; a
+  bot check; a refused image; robots.txt; a rate-limit response; an unreachable
+  site; resume; and duplicate prevention.
+* **Not yet run on real JAMA pages.** This cloud environment's network policy
+  refuses jamanetwork.com. Run the 3-case test on a study computer, or allow
+  `jamanetwork.com` (and the image host it uses) in the environment's network
+  settings so it can be tested here.
+
 ## What works now
 
 * **Import and audit of the real workbook.** It is opened read-only and its

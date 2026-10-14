@@ -88,8 +88,8 @@ collection**, and press **Save**.
 
 ### 3b. Images: prep team
 
-1. Download the published figure(s) at the highest resolution. Keep the
-   originals unchanged in a separate folder.
+1. Get the published figure(s) at the highest resolution with the **Figures**
+   page (section 3c). It keeps the originals unchanged in `data/images/original/`.
 2. Make a copy and crop out panel letters, captions and any text naming a
    diagnosis. Keep arrows.
 3. Save the prepared copy in `data/images/prepared/` as **IMG-390-1.png** (then
@@ -103,6 +103,96 @@ collection**, and press **Save**.
    "unavailable", which is never counted as wrong.
 
 When both steps are done, the case's image prompts become ready automatically.
+
+---
+
+## 3c. Download case figures (Figures page)
+
+Click **Figures** in the top bar. Pilot Desk reads each case's article link from
+the workbook, finds the figures shown in the **case presentation**, and saves
+the largest version offered for each one, including every panel. Figures from
+the answer or discussion part of the article, supplementary eFigures,
+thumbnails, journal logos and related-article pictures are skipped. Files are
+stored **unchanged** in `data/images/original/<case>/`, for example
+`data/images/original/390/IMG-390-1.jpg`. Your cropped copies live separately
+in `data/images/prepared/`.
+
+**Step 1: test three cases.** The box is pre-filled with three pilot cases.
+Press **Download test cases**. It takes a minute or two, because Pilot Desk
+waits 6–8 seconds between requests on purpose.
+
+**Step 2: check the test.** Open each case's **Review** page and the
+**inspection report**. The report lists every image found on each article page
+and which one was chosen. Check that:
+
+* every figure the case text mentions is there;
+* all panels are there;
+* the images are full size, not small previews;
+* nothing came from the answer or discussion section.
+
+If all is right, sign off with your initials. The expand buttons only work
+after this sign-off.
+
+**Step 3: expand.** Use **Download all 10 pilot cases**, and later **Download
+all included cases**. All 421 included cases take about 2–3 hours. You can
+press **Stop** at any time. Pressing a download button again resumes: finished
+cases and files are skipped and never duplicated.
+
+**Review each figure (prep team).** On a case's Review page:
+
+1. Click the image to open it full size. Look for burned-in text, arrows with
+   labels, panel captions or stain names that could give the answer away.
+2. Choose whether the figure belongs to **this case's presentation**. The
+   published caption and the case text (the "Case text" box) are shown to help
+   you match them. Tick the box if the image itself contains revealing text.
+3. Only after **Confirmed** can you press **Make prepared copy for cropping**.
+   This puts an identical copy in `data/images/prepared/`. Crop that copy in any
+   image editor (Preview, Paint, Photos) and keep arrows. Then describe it on
+   the case's **Images** page as before.
+
+Nothing is approved automatically. The original is never changed.
+
+### When a figure cannot be downloaded automatically
+
+Pilot Desk does not try to get around access controls. It never signs in,
+never uses your browser's saved login, never solves "are you a robot" checks,
+and never retries a refusal. When it meets any of these, it stops for that case
+and lists it under **Needs manual download**:
+
+* a sign-in or purchase page;
+* the site's robots.txt rules forbidding automated access;
+* a bot check;
+* a refused image;
+* a missing link in the workbook. Case 183's link field contains a title
+  instead of a web address.
+
+If the site shows a bot check or asks it to slow down, the whole batch pauses.
+
+To download a listed figure yourself in a normal browser:
+
+1. On the case's Review page, click **Open the article in your browser**. If
+   your university gives you JAMA access, sign in the usual way: through the
+   library's journal link, or "Sign in → Access through your institution" on
+   the article page.
+2. Scroll to the case description. Ignore anything under "Diagnosis" or
+   "Discussion".
+3. On the figure, click **View Large** (or the figure itself) to open the
+   full-size image. If there is a **Download** option that gives an image (not a
+   PowerPoint slide), use it. Otherwise right-click the large image → **Save
+   image as…**.
+4. Back on the Review page, under **Add a figure downloaded in your browser**,
+   choose the file and type the figure number. If a figure comes as several
+   files, use part letters a, b, c… You can also right-click the image → **Copy
+   image address** and paste it in the image-address box, and add your initials.
+   The file is saved unchanged under a neutral name and still needs review.
+
+If an article has no figures you can reach, or a figure is video only, record
+that on the case's **Images** page ("cannot be uploaded"). Its image runs will
+be marked unavailable, which is never counted as wrong.
+
+**Network note.** Downloads use the computer's own internet connection. On a
+university network, articles your library subscribes to may be reachable. At
+home they may not be. Either way, nothing is circumvented.
 
 ---
 

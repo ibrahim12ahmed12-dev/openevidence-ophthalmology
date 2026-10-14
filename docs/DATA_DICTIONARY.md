@@ -170,3 +170,32 @@ image-arm text and images are **shared** with `data/`
 `pilot_signoff.json` records the model-selector check and named
 collectors/graders. `PILOT_README.md` marks the folder as pilot data. Check C16
 fails if pilot runs ever appear in the main collection log.
+
+## images/original/ (G + H): downloaded figures, never edited
+
+`images/original/<case>/IMG-<case>-<figure>[part].<ext>` holds the files exactly
+as served (part letters a, b, … only when a figure is split into several
+images). `_article_page.html` is the cached article page, kept so pages are not
+re-requested on resume. `download_gate.json` records the 3-case test sign-off.
+`inspection_report.md` lists, for the test cases, every figure block found and
+the image URLs considered.
+
+### images/original/figure_manifest.csv: one row per figure file (or per problem)
+
+| Column | Meaning |
+|---|---|
+| case_id, figure_number, part | Stable case ID; published figure number; panel part letter (`e` = supplementary eFigure) |
+| section | `case` (presentation), `answer` (under Diagnosis/Discussion…), `supplement` |
+| cited_in_case_text | Whether the case text cites this figure number (yes/no/unknown) |
+| source_article_url | Article link from the workbook |
+| image_url | The URL actually saved (largest version obtained) |
+| candidate_urls | Up to 6 URLs considered for this image (audit) |
+| local_filename, width, height, bytes, sha256 | The saved original |
+| caption_start, caption_match_score | Start of the published caption; share of its words found in the case text (matching aid only) |
+| download_status | `downloaded`, `manual_downloaded`, `manual_needed`, `failed` (network), `skipped_answer_section`, `skipped_supplement` |
+| http_status, status_reason, downloaded_at | What happened and why |
+| review_status | `unreviewed` (default), `confirmed_case_figure`, `answer_section_figure`, `wrong_case`, `not_a_figure`, `unsure`. Set only by a person. |
+| contains_revealing_text | yes/no: image has burned-in text or labels that must be cropped |
+| reviewed_by, reviewed_date, review_notes | Audit trail |
+
+A prepared copy can be made only from a `confirmed_case_figure` row, and it never overwrites an existing prepared file.

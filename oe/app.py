@@ -22,12 +22,13 @@ import email.policy
 import html
 import re
 import threading
+import time
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote
 
-from . import collection, grading, importer, legend, pilot, prompts, validate
+from . import collection, figures, grading, importer, legend, pilot, prompts, validate
 from .common import (INPUT_LABEL, images_dir, load_config, path, read_csv, sha256_file,
                      write_csv)
 
@@ -49,6 +50,7 @@ textarea{width:100%;font:13px/1.4 ui-monospace,monospace;background:var(--bg);co
 input,select{font:inherit;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
 button,.btn{font:inherit;font-weight:600;background:var(--acc);color:#fff;border:0;border-radius:8px;padding:8px 14px;cursor:pointer;text-decoration:none;display:inline-block}
 button.secondary{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+button:disabled{opacity:.35;cursor:not-allowed}
 .muted{color:var(--muted);font-size:14px}.big{font-size:20px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 16px}
 label{display:block;font-size:14px;color:var(--muted)}label input,label select{display:block;width:100%;margin-top:2px}
 .warnbox{border-left:4px solid var(--warn);padding:8px 12px;background:var(--card);margin:10px 0}.badbox{border-left:4px solid var(--bad);padding:8px 12px;background:var(--card);margin:10px 0}
@@ -71,7 +73,7 @@ document.querySelectorAll('.fill-tz').forEach(e=>{if(!e.value)e.value=Intl.DateT
 
 def page(title, body):
     nav = ("<div class='top'><b>Pilot Desk</b><a href='/'>Home</a><a href='/checks'>Run checks</a>"
-           "<a href='/export'>Export for grading</a><a href='/keys'>Answer keys (coordinator)</a></div>")
+           "<a href='/figures'>Figures</a><a href='/export'>Export for grading</a><a href='/keys'>Answer keys (coordinator)</a></div>")
     return (f"<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
             f"<title>{E(title)}</title><style>{CSS}</style><script>{JS}</script></head><body>{nav}<main>{body}</main></body></html>")
 
@@ -545,6 +547,177 @@ the adjudicator saves a filled copy as <code>adjudication_return.csv</code> in t
 <form method='post' action='/merge' enctype='multipart/form-data'><button class='secondary'>Combine returned grades</button></form>{merged or ''}</div>""")
 
 
+
+
+# ----------------------------------------------------------------------------- figure download + review
+
+IMG_TYPES = {"jpg": "image/jpeg", "png": "image/png", "gif": "image/gif", "webp": "image/webp", "tif": "image/tiff"}
+
+
+def _scope_ids(scope):
+    pr = STATE["pilot"]
+    if scope == "all":
+        return [r["case_id"] for r in read_csv(path(pr, "registry")) if r["eligible"] == "Yes"]
+    return pilot.pilot_cases(pr)
+
+
+def v_figures(scope="pilot", msg=""):
+    pr = STATE["pilot"]
+    st = figures.STATE
+    g = figures.gate(pr)
+    test_default = g.get("test_cases") or ", ".join(pilot.pilot_cases(pr)[:3])
+    ids = _scope_ids(scope)
+    man = figures.read_manifest(pr)
+    reg = {r["case_id"]: r for r in read_csv(path(pr, "registry"))}
+    sm = figures.summary(pr, ids)
+    rows = ""
+    for c in ids:
+        rr = [r for r in man if r["case_id"] == c]
+        if not rr and scope == "all" and len(ids) > 60:
+            continue
+        dl = sum(r["download_status"] in ("downloaded", "manual_downloaded") for r in rr)
+        mn = sum(r["download_status"] == "manual_needed" for r in rr)
+        unrev = sum(r["download_status"] in ("downloaded", "manual_downloaded") and r.get("review_status") == "unreviewed" for r in rr)
+        conf = sum(r.get("review_status") == "confirmed_case_figure" for r in rr)
+        sk = sum(r["download_status"].startswith("skipped") for r in rr)
+        state = "not started" if not rr else ("needs manual download" if mn else ("failed" if any(r["download_status"] == "failed" for r in rr) else "downloaded"))
+        cls = {"not started": "pending", "needs manual download": "blocking", "failed": "blocking", "downloaded": "ready"}[state]
+        rows += (f"<tr><td class='big'>{E(c)}</td><td><span class='pill {cls}'>{state}</span></td><td>{dl}</td><td>{sk}</td>"
+                 f"<td>{conf} confirmed / {unrev} unreviewed</td><td><a class='btn' href='/figures/{c}'>Review</a></td></tr>")
+    running = st["running"]
+    refresh = "<meta http-equiv='refresh' content='4'>" if running else ""
+    eta = ""
+    if running and st["done"]:
+        per = (time.time() - st["started"]) / st["done"]
+        eta = f" · about {int(per * (st['total'] - st['done']) / 60) + 1} min left"
+    prog = (f"<div class='card'><b>{'Downloading' if running else 'Last run'}:</b> {st['done']} of {st['total']} case(s)"
+            f"{(' · now case ' + E(st['current'])) if st['current'] else ''}{eta} · {E(st['phase'])}"
+            f"<progress max='{max(st['total'], 1)}' value='{st['done']}' style='width:100%'></progress>"
+            + ("<form method='post' action='/figures/stop' enctype='multipart/form-data'><button class='secondary'>Stop after current case</button></form>" if running else "")
+            + f"<pre class='muted'>{E(chr(10).join(st['log'][-12:]))}</pre></div>") if (running or st["log"]) else ""
+    gated = not g.get("test_signed_by")
+    manual = [r for r in man if r["case_id"] in ids and r["download_status"] in ("manual_needed", "failed")]
+    mrows = "".join(f"<tr><td>{E(r['case_id'])}</td><td>{E(r.get('figure_number') or 'all')}</td><td>{E(r['status_reason'])}</td>"
+                    f"<td><a href='{E(r['source_article_url'] or reg.get(r['case_id'], {}).get('source_url', ''))}' target='_blank' rel='noopener noreferrer'>open article</a> · "
+                    f"<a href='/figures/{E(r['case_id'])}'>upload</a></td></tr>" for r in manual)
+    note = f"<div class='warnbox'>{msg}</div>" if msg else ""
+    disabled = "disabled title='Sign off the 3-case test first'" if gated else ""
+    return page("Figures", f"""{refresh}<h1>Case figures</h1>{note}
+<div class='card'><p>Downloads the published figures from each case's JAMA article link, slowly (one request every ~6-8 seconds),
+into <code>{E(str(figures.originals_dir(pr)))}</code>. Originals are never edited. Figures that appear in the answer/discussion section are skipped.
+Anything the site does not allow to be downloaded automatically (sign-in, purchase, bot check) is <b>not</b> worked around: it is listed below for download in your browser.</p>
+<p class='muted'>Nothing is approved automatically. A person confirms each figure on its Review page before a prepared copy can be made.</p></div>
+{prog}
+<h2>Step 1 - test on three pilot cases</h2>
+<form method='post' action='/figures/start' enctype='multipart/form-data' class='card'>
+<input type='hidden' name='scope' value='test'><label>Test case IDs<input name='cases' value='{E(test_default)}'></label>
+<p><button {'disabled' if running else ''}>Download test cases</button></p>
+<p class='muted'>Then open each case's Review page, check every figure, and read the <a href='/figures/report'>inspection report</a>
+(what was found on each page and which image was chosen).</p></form>
+<form method='post' action='/figures/gate' enctype='multipart/form-data' class='card'>
+<b>Step 2 - sign off the test</b> {('<span class="pill ready">signed off by ' + E(g['test_signed_by']) + ' ' + E(g.get('test_signed_date', '')) + '</span>') if g.get('test_signed_by') else ''}
+<p class='muted'>Only when the test figures are correct (right case, all panels, full size, no answer-section figures, no logos or thumbnails).</p>
+<div class='grid'><label>Your initials<input name='who' required></label><label>Notes<input name='notes'></label></div><p><button class='secondary'>I checked the test results</button></p></form>
+<h2>Step 3 - expand</h2>
+<div class='card'><form method='post' action='/figures/start' enctype='multipart/form-data' style='display:inline'>
+<input type='hidden' name='scope' value='pilot'><button {disabled}>Download all 10 pilot cases</button></form>
+<form method='post' action='/figures/start' enctype='multipart/form-data' style='display:inline'>
+<input type='hidden' name='scope' value='all'><button {disabled}>Download all included cases (~1 h per 150 cases)</button></form>
+<form method='post' action='/figures/start' enctype='multipart/form-data' style='display:inline'>
+<input type='hidden' name='scope' value='{E(scope)}'><input type='hidden' name='retry' value='1'><button class='secondary' {disabled}>Retry failed / manual cases</button></form>
+<p class='muted'>Interrupted runs resume where they stopped: finished cases and files are skipped, never duplicated.</p></div>
+<h2>Status - {'all included cases' if scope == 'all' else 'pilot cases'} <span class='muted'>(<a href='/figures?scope={'pilot' if scope == 'all' else 'all'}'>show {'pilot' if scope == 'all' else 'all included'}</a>)</span></h2>
+<p class='muted'>{sm['downloaded']} file(s) downloaded · {sm['skipped_answer']} answer-section figure(s) skipped · {sm['unreviewed']} unreviewed ·
+{len(sm['manual_needed_cases'])} case(s) need manual download. Manifest: <code>{E(str(figures.manifest_path(pr)))}</code></p>
+<div class='card'><table><tr><th>Case</th><th>Status</th><th>Files</th><th>Skipped</th><th>Review</th><th></th></tr>{rows or '<tr><td colspan=6>No cases attempted yet.</td></tr>'}</table></div>
+<h2>Needs manual download in your browser</h2>
+<div class='card'><table><tr><th>Case</th><th>Figure</th><th>Why</th><th></th></tr>{mrows or '<tr><td colspan=4>None.</td></tr>'}</table>
+<p class='muted'>How: see "Manual download" in docs/PILOT_GUIDE.md. Use your normal browser and your own access; then upload the file on the case's Review page.</p></div>""")
+
+
+def v_figure_case(cid, msg=""):
+    pr = STATE["pilot"]
+    reg = {r["case_id"]: r for r in read_csv(path(pr, "registry"))}
+    r0 = reg.get(cid)
+    if not r0:
+        return page("Not found", "<p>Unknown case.</p>")
+    rows = [r for r in figures.read_manifest(pr) if r["case_id"] == cid]
+    cards = ""
+    for r in rows:
+        fn = r.get("local_filename", "")
+        if fn and r["download_status"] in ("downloaded", "manual_downloaded"):
+            sel = "<option value=''>- choose -</option>" + "".join(
+                f"<option value='{k}' {'selected' if r.get('review_status') == k else ''}>{E(v)}</option>" for k, v in figures.REVIEW_CHOICES.items())
+            prepared = (images_dir(pr) / fn).exists()
+            cards += f"""<div class='card'><h2>{E(fn)} <span class='pill {'ready' if r.get('review_status') == 'confirmed_case_figure' else 'pending'}'>{E(r.get('review_status', 'unreviewed'))}</span></h2>
+<a href='/original/{E(cid)}/{E(fn)}' target='_blank'><img src='/original/{E(cid)}/{E(fn)}' alt='{E(fn)}' style='max-width:100%;max-height:640px;border:1px solid var(--line);background:#fff'></a>
+<p class='muted'>Click the image to open it full size and zoom in on corners and panel labels.</p>
+<table><tr><td>Figure</td><td>{E(r['figure_number'])}{E(r['part'])} · section: {E(r.get('section', ''))} · cited in case text: {E(r.get('cited_in_case_text', ''))}</td></tr>
+<tr><td>Size</td><td>{E(r.get('width', ''))} × {E(r.get('height', ''))} px · {E(r.get('bytes', ''))} bytes</td></tr>
+<tr><td>Published caption (start)</td><td>{E(r.get('caption_start', ''))} <span class='muted'>(word match with case text: {E(r.get('caption_match_score', ''))})</span></td></tr>
+<tr><td>Source</td><td><a href='{E(r['source_article_url'])}' target='_blank' rel='noopener noreferrer'>article</a> · <span class='muted'>{E(r.get('image_url', '')[:120])}</span></td></tr>
+<tr><td>Notes</td><td>{E(r.get('status_reason', ''))}</td></tr></table>
+<form method='post' action='/figures/{E(cid)}/review' enctype='multipart/form-data'><input type='hidden' name='file' value='{E(fn)}'>
+<div class='grid'><label>Does this figure belong to case {E(cid)}'s presentation?<select name='status'>{sel}</select></label>
+<label>Your initials<input name='who' value='{E(r.get('reviewed_by', ''))}' required></label></div>
+<label><input type='checkbox' name='revealing' value='1' style='display:inline;width:auto' {'checked' if r.get('contains_revealing_text') == 'yes' else ''}>
+The image itself contains text or labels that could reveal the answer (must be cropped in the prepared copy)</label>
+<label>Notes<input name='notes' value='{E(r.get('review_notes', ''))}'></label><p><button>Save review</button></p></form>
+<form method='post' action='/figures/{E(cid)}/prepare' enctype='multipart/form-data'><input type='hidden' name='file' value='{E(fn)}'>
+<button class='secondary' {'disabled' if r.get('review_status') != 'confirmed_case_figure' or prepared else ''}>{'Prepared copy exists' if prepared else 'Make prepared copy for cropping'}</button></form></div>"""
+        else:
+            cards += (f"<div class='card'><b>Figure {E(r.get('figure_number') or '?')}{E(r.get('part', ''))}</b> - "
+                      f"<span class='pill {'blocking' if r['download_status'] in ('manual_needed', 'failed') else 'pending'}'>{E(r['download_status'])}</span>"
+                      f"<p>{E(r.get('status_reason', ''))}</p></div>")
+    note = f"<div class='warnbox'>{msg}</div>" if msg else ""
+    return page(f"Figures {cid}", f"""<p><a href='/figures'>← all figures</a></p><h1>Case {E(cid)}: figures</h1>{note}
+<p><a class='btn' href='{E(r0['source_url'])}' target='_blank' rel='noopener noreferrer'>Open the article in your browser</a></p>
+<details class='card'><summary>Case text, for matching figures to this case (no title)</summary><pre>{E(r0['text_only_input'])}</pre></details>
+{cards or "<div class='card'>Not downloaded yet. Use the Figures page, or upload below.</div>"}
+<h2>Add a figure downloaded in your browser</h2>
+<form method='post' action='/figures/{E(cid)}/upload' enctype='multipart/form-data' class='card'>
+<div class='grid'><label>Image file<input type='file' name='file' accept='image/*' required></label>
+<label>Figure number<input name='figure_number' required></label>
+<label>Part letter if the figure has several files (a, b, ...)<input name='part'></label>
+<label>Image address (optional; right-click the image → Copy image address)<input name='image_url'></label>
+<label>Your initials<input name='who' required></label></div>
+<p class='muted'>The file is stored unchanged as IMG-{int(cid):03d}-&lt;figure&gt;.ext and still needs review.</p><p><button>Upload</button></p></form>""")
+
+
+def v_fig_report():
+    pr = STATE["pilot"]
+    p = figures.originals_dir(pr) / "inspection_report.md"
+    body = E(p.read_text(encoding="utf-8")) if p.exists() else "No report yet: run the 3-case test first."
+    return page("Inspection report", f"<p><a href='/figures'>← figures</a></p><div class='card'><pre>{body}</pre></div>")
+
+
+def start_figures(f):
+    pr = STATE["pilot"]
+    scope = f.get("scope", "test")
+    g = figures.gate(pr)
+    if scope == "test":
+        ids = [x for x in re.findall(r"\d+", f.get("cases", ""))]
+        reg = {r["case_id"]: r for r in read_csv(path(pr, "registry"))}
+        bad = [x for x in ids if reg.get(x, {}).get("eligible") != "Yes"]
+        if not ids or bad:
+            return "Not started: enter included case IDs" + (f" (not included: {', '.join(bad)})" if bad else "")
+        figures.save_gate(pr, test_cases=", ".join(ids))
+
+        def job():
+            figures.run_batch(pr, ids)
+            figures.inspection_report(pr, ids)
+        if figures.STATE["running"]:
+            return "A download is already running."
+        figures.STATE["log"] = []
+        threading.Thread(target=job, daemon=True).start()
+        return f"Started test download for cases {', '.join(ids)}."
+    if not g.get("test_signed_by"):
+        return "Not started: sign off the 3-case test first."
+    ids = _scope_ids(scope)
+    ok = figures.start_background(pr, ids, retry_manual=bool(f.get("retry")))
+    return f"Started: {len(ids)} case(s) in scope; finished cases are skipped." if ok else "A download is already running."
+
+
 # ----------------------------------------------------------------------------- server
 
 def parse_body(handler) -> tuple[dict, dict, dict]:
@@ -595,6 +768,23 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send(v_images(m.group(1)))
             if p == "/keys":
                 return self.send(v_keys())
+            if p == "/figures":
+                q = self.path.split("?", 1)[1] if "?" in self.path else ""
+                return self.send(v_figures("all" if "scope=all" in q else "pilot"))
+            if p == "/figures/report":
+                return self.send(v_fig_report())
+            if m := re.fullmatch(r"/figures/(\d+)", p):
+                return self.send(v_figure_case(m.group(1)))
+            if m := re.fullmatch(r"/original/(\d+)/(IMG-\d{3}-\d+[a-j]?\.(jpg|png|gif|webp|tif))", p):
+                fp = figures.originals_dir(STATE["pilot"]) / f"{int(m.group(1)):03d}" / m.group(2)
+                if not fp.is_file():
+                    return self.send(page("Not found", "<p>No such file.</p>"), 404)
+                b = fp.read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Type", IMG_TYPES[m.group(3)])
+                self.send_header("Content-Length", str(len(b)))
+                self.end_headers()
+                return self.wfile.write(b)
             if p == "/checks":
                 return self.send(v_checks())
             if p == "/export":
@@ -616,6 +806,26 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send(v_images(m.group(1), save_images(m.group(1), f, multi)))
             if p == "/keys":
                 return self.send(v_keys(save_key(f)))
+            if p == "/figures/start":
+                return self.send(v_figures(f.get("scope") if f.get("scope") in ("pilot", "all") else "pilot", start_figures(f)))
+            if p == "/figures/stop":
+                figures.STATE["stop"] = True
+                return self.send(v_figures(msg="Stopping after the current case."))
+            if p == "/figures/gate":
+                if not f.get("who", "").strip():
+                    return self.send(v_figures(msg="Initials required."))
+                figures.save_gate(STATE["pilot"], test_signed_by=f["who"].strip(), test_signed_date=dt.date.today().isoformat(),
+                                  test_notes=f.get("notes", ""))
+                return self.send(v_figures(msg="Test signed off. You can now expand."))
+            if m := re.fullmatch(r"/figures/(\d+)/review", p):
+                return self.send(v_figure_case(m.group(1), figures.save_review(STATE["pilot"], m.group(1), f.get("file", ""),
+                                 f.get("status", ""), bool(f.get("revealing")), f.get("who", ""), f.get("notes", ""))))
+            if m := re.fullmatch(r"/figures/(\d+)/prepare", p):
+                return self.send(v_figure_case(m.group(1), figures.make_prepared_copy(STATE["pilot"], m.group(1), f.get("file", ""))))
+            if m := re.fullmatch(r"/figures/(\d+)/upload", p):
+                fn, data = files.get("file", ("", b""))
+                return self.send(v_figure_case(m.group(1), figures.add_manual_file(STATE["pilot"], m.group(1), f.get("figure_number", ""),
+                                 f.get("part", ""), data, fn, f.get("image_url", ""), f.get("who", ""))))
             if p == "/synonyms":
                 return self.send(v_keys(save_synonyms(f)))
             if p == "/signoff":
