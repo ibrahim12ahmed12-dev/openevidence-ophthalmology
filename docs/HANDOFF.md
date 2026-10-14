@@ -22,10 +22,7 @@
   thumbnail, logo, related-article and discussion figures; a sign-in page; a
   bot check; a refused image; robots.txt; a rate-limit response; an unreachable
   site; resume; and duplicate prevention.
-* **Not yet run on real JAMA pages.** This cloud environment's network policy
-  refuses jamanetwork.com. Run the 3-case test on a study computer, or allow
-  `jamanetwork.com` (and the image host it uses) in the environment's network
-  settings so it can be tested here.
+* **Not yet run on real JAMA pages.** JAMA's robots.txt blocks Anthropic's AI agents (`anthropic-ai`, `Claude-Web`, `ClaudeBot`), so Claude will not fetch the site. Run the 3-case test in Pilot Desk on a study computer after checking JAMA's text-and-data-mining terms, then share the inspection report and manifest for checking.
 
 ## What works now
 
