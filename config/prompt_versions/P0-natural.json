@@ -1,0 +1,12 @@
+{
+  "version": "P0-natural",
+  "status": "CANDIDATE ONLY - not an approved arm; do not collect with it unless the team replaces P1",
+  "style": "natural clinical question",
+  "description": "Mimics how a clinician might paste a case into OpenEvidence: no role prompt, no chain-of-thought instruction, a plain question at the end, and a light request for the two answer lines.",
+  "text_only_prefix": "",
+  "image_arm_prefix": "The images from this case are attached.",
+  "question_stem": "What would you do next?",
+  "closing_question": "What is the most likely diagnosis, and which option is the best next step? Please start with \"Diagnosis:\" and \"Next step:\" (letter).",
+  "source_exclusion_instruction": "Do not search for, use, or cite JAMA Ophthalmology Clinical Challenge articles.",
+  "assembly": "[prefix + '\\n\\n'] + [source_exclusion + '\\n\\n'] + case_text + '\\n\\n' + question_stem + '\\n' + options + '\\n\\n' + closing_question"
+}

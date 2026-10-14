@@ -1,0 +1,5 @@
+"data_status","source","outcome","correct","denominator","accuracy","ci_lower","ci_upper"
+"SYNTHETIC - NOT STUDY DATA","2026 study (earlier OpenEvidence model, text only; historical, not part of this study)","dx",200,421,0.475059382422803,0.427798570664642,0.522771225281608
+"SYNTHETIC - NOT STUDY DATA","2026 study (earlier OpenEvidence model, text only; historical, not part of this study)","mgmt",283,421,0.672209026128266,0.625988738605819,0.715315051289126
+"SYNTHETIC - NOT STUDY DATA","This study: Osler / Text only (closest successor condition)","dx",210,421,0.498812351543943,0.451278245417846,0.546367935341499
+"SYNTHETIC - NOT STUDY DATA","This study: Osler / Text only (closest successor condition)","mgmt",250,421,0.593824228028504,0.546267753915199,0.63968396609653

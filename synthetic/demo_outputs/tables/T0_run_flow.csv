@@ -1,0 +1,12 @@
+"data_status","item","n"
+"SYNTHETIC - NOT STUDY DATA","Scheduled main runs",2526
+"SYNTHETIC - NOT STUDY DATA","  of which eligible cases",2526
+"SYNTHETIC - NOT STUDY DATA","Completed",2520
+"SYNTHETIC - NOT STUDY DATA","Unavailable (e.g. image cannot be uploaded)",6
+"SYNTHETIC - NOT STUDY DATA","Failed without completed retry",0
+"SYNTHETIC - NOT STUDY DATA","Pending",0
+"SYNTHETIC - NOT STUDY DATA","Withdrawn",0
+"SYNTHETIC - NOT STUDY DATA","Analysable - diagnosis",2520
+"SYNTHETIC - NOT STUDY DATA","Analysable - management",2520
+"SYNTHETIC - NOT STUDY DATA","Scheduled retest runs",300
+"SYNTHETIC - NOT STUDY DATA","Completed retest runs",300

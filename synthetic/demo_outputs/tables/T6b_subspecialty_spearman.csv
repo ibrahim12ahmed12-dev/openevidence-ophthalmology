@@ -1,0 +1,7 @@
+"data_status","condition","label","n_subspecialties","spearman_rho","p_value","note"
+"SYNTHETIC - NOT STUDY DATA",1,"Osler / Text only",7,0.846881214933825,0.0161971274678717,"exploratory; subspecialties with >= 20 cases"
+"SYNTHETIC - NOT STUDY DATA",2,"Osler / Text + image",7,0.25,0.59484126984127,"exploratory; subspecialties with >= 20 cases"
+"SYNTHETIC - NOT STUDY DATA",3,"Sackett / Text only",7,-0.107142857142857,0.83968253968254,"exploratory; subspecialties with >= 20 cases"
+"SYNTHETIC - NOT STUDY DATA",4,"Sackett / Text + image",7,-0.892857142857143,0.0123015873015873,"exploratory; subspecialties with >= 20 cases"
+"SYNTHETIC - NOT STUDY DATA",5,"Snow / Text only",7,0.642857142857143,0.138888888888889,"exploratory; subspecialties with >= 20 cases"
+"SYNTHETIC - NOT STUDY DATA",6,"Snow / Text + image",7,0.5,0.266666666666667,"exploratory; subspecialties with >= 20 cases"

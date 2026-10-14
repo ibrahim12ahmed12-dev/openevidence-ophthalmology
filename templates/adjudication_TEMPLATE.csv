@@ -1,0 +1,1 @@
+response_id,case_id,outcomes_in_disagreement,reference_diagnosis,accepted_dx_synonyms,correct_letter,response_file,g1_dx,g2_dx,g1_dx_reason,g2_dx_reason,g1_partial,g2_partial,g1_mgmt_letter,g2_mgmt_letter,g1_mgmt,g2_mgmt,g1_mgmt_reason,g2_mgmt_reason,g1_interp,g2_interp,adjudicator_id,adj_dx_correct,adj_dx_partial,adj_mgmt_correct,adj_interp_category,adj_reason

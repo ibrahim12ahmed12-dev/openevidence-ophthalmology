@@ -1,0 +1,19 @@
+"data_status","outcome","family","comparison","paired_cases","A_only","B_only","discordance","disc_lower","disc_upper","mdd_pp_at_upper_alpha0167"
+"SYNTHETIC - NOT STUDY DATA","dx","F1_input_within_model","Osler / Text + image vs Osler / Text only",419,73,78,0.360381861575179,0.315871103029317,0.407429444825396,10.25
+"SYNTHETIC - NOT STUDY DATA","dx","F1_input_within_model","Sackett / Text + image vs Sackett / Text only",419,78,78,0.372315035799523,0.327383303299493,0.419566770379604,10.5
+"SYNTHETIC - NOT STUDY DATA","dx","F1_input_within_model","Snow / Text + image vs Snow / Text only",419,80,74,0.367541766109785,0.322774821682064,0.414715441667279,10.5
+"SYNTHETIC - NOT STUDY DATA","dx","F2_model_within_text","Sackett / Text only vs Osler / Text only",421,85,83,0.399049881235154,0.353387895598254,0.446537468946088,10.75
+"SYNTHETIC - NOT STUDY DATA","dx","F2_model_within_text","Snow / Text only vs Osler / Text only",421,94,70,0.389548693586698,0.344166230985597,0.436928579633507,10.75
+"SYNTHETIC - NOT STUDY DATA","dx","F2_model_within_text","Snow / Text only vs Sackett / Text only",421,90,68,0.375296912114014,0.330368177320958,0.422480802410289,10.5
+"SYNTHETIC - NOT STUDY DATA","dx","F3_model_within_image","Sackett / Text + image vs Osler / Text + image",419,86,81,0.398568019093079,0.352814072404155,0.446164958088585,10.75
+"SYNTHETIC - NOT STUDY DATA","dx","F3_model_within_image","Snow / Text + image vs Osler / Text + image",419,87,53,0.334128878281623,0.29065209028861,0.380619500752459,10
+"SYNTHETIC - NOT STUDY DATA","dx","F3_model_within_image","Snow / Text + image vs Sackett / Text + image",419,92,63,0.369928400954654,0.325078465468559,0.417141703045661,10.5
+"SYNTHETIC - NOT STUDY DATA","mgmt","F1_input_within_model","Osler / Text + image vs Osler / Text only",419,80,80,0.381861575178998,0.336614503474453,0.429255190864151,10.5
+"SYNTHETIC - NOT STUDY DATA","mgmt","F1_input_within_model","Sackett / Text + image vs Sackett / Text only",419,83,91,0.41527446300716,0.369069780806567,0.46301858584031,11
+"SYNTHETIC - NOT STUDY DATA","mgmt","F1_input_within_model","Snow / Text + image vs Snow / Text only",419,73,76,0.355608591885442,0.311274685091948,0.402566052433012,10.25
+"SYNTHETIC - NOT STUDY DATA","mgmt","F2_model_within_text","Sackett / Text only vs Osler / Text only",421,94,74,0.399049881235154,0.353387895598254,0.446537468946088,10.75
+"SYNTHETIC - NOT STUDY DATA","mgmt","F2_model_within_text","Snow / Text only vs Osler / Text only",421,90,70,0.380047505938242,0.334962894393845,0.427301362300021,10.5
+"SYNTHETIC - NOT STUDY DATA","mgmt","F2_model_within_text","Snow / Text only vs Sackett / Text only",421,84,84,0.399049881235154,0.353387895598254,0.446537468946088,10.75
+"SYNTHETIC - NOT STUDY DATA","mgmt","F3_model_within_image","Sackett / Text + image vs Osler / Text + image",419,88,77,0.393794749403341,0.348179843276613,0.441339376886374,10.75
+"SYNTHETIC - NOT STUDY DATA","mgmt","F3_model_within_image","Snow / Text + image vs Osler / Text + image",419,88,71,0.379474940334129,0.334304934976418,0.426834854197309,10.5
+"SYNTHETIC - NOT STUDY DATA","mgmt","F3_model_within_image","Snow / Text + image vs Sackett / Text + image",419,81,75,0.372315035799523,0.327383303299493,0.419566770379604,10.5

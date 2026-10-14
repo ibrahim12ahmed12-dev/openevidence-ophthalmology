@@ -1,0 +1,34 @@
+=== dx ===
+List of 10
+ $ outcome                          : chr "dx"
+ $ formula                          : chr "y ~ model * input + subspecialty_covariate + (1 | case_id)"
+ $ n_runs                           : int 2520
+ $ n_cases                          : int 421
+ $ status                           : chr "fitted"
+ $ warnings                         : chr(0) 
+ $ singular                         : logi FALSE
+ $ random_intercept_sd              : num 1.26
+ $ possible_separation_terms        : chr(0) 
+ $ covariate_levels_all_same_outcome: Factor w/ 8 levels "Retina and Vitreous",..: 
+Sparse / all-same cells (n<5 or 0% or 100%):
+[1] subspecialty_covariate model                  input                 
+[4] n                      correct               
+<0 rows> (or 0-length row.names)
+
+=== mgmt ===
+List of 10
+ $ outcome                          : chr "mgmt"
+ $ formula                          : chr "y ~ model * input + subspecialty_covariate + (1 | case_id)"
+ $ n_runs                           : int 2520
+ $ n_cases                          : int 421
+ $ status                           : chr "fitted"
+ $ warnings                         : chr(0) 
+ $ singular                         : logi FALSE
+ $ random_intercept_sd              : num 0.929
+ $ possible_separation_terms        : chr(0) 
+ $ covariate_levels_all_same_outcome: Factor w/ 8 levels "Retina and Vitreous",..: 
+Sparse / all-same cells (n<5 or 0% or 100%):
+[1] subspecialty_covariate model                  input                 
+[4] n                      correct               
+<0 rows> (or 0-length row.names)
+
